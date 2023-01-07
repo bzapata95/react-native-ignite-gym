@@ -13,7 +13,7 @@ export function HomeHeader() {
         <VStack>
           <Text color='gray.100' fontSize="md">Hola</Text>
 
-          <Heading color='gray.100' fontSize="md">Bryan</Heading>
+          <Heading color='gray.100' fontSize="md" fontFamily="heading">Bryan</Heading>
         </VStack>
 
       </HStack>

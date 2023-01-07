@@ -19,6 +19,7 @@ export function ExerciseCard ({...rest}: Props) {
           <Heading
             fontSize="lg"
             color="white"
+            fontFamily="heading"
           >Remada unilateral</Heading>
 
           <Text
