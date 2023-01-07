@@ -1,17 +1,44 @@
 import { Platform } from "react-native";
 import { VStack, Image, Text, Center, Heading, ScrollView } from "native-base";
+import * as yup from 'yup'
+import {yupResolver} from '@hookform/resolvers/yup'
 
 import LogoSvg from "@assets/logo.svg";
 import backgroundImg from "@assets/background.png";
 import { Input } from "@components/Input";
 import { Button } from "@components/Button";
 import { useNavigation } from "@react-navigation/native";
+import { useForm, Controller } from 'react-hook-form';
+
+type FormDataProps = {
+  name: string;
+  email: string;
+  password: string;
+  password_confirm: string;
+}
+
+const signUpSchema = yup.object({
+  name: yup.string().required('Name is required'),
+  email: yup.string().required('Email is required').email('Email is invalid'),
+  password: yup.string().required('Password is required').min(6, 'Password must be at least 6 characters'),
+  password_confirm: yup.string().required('Password confirm is required').oneOf([yup.ref('password'), null], 'Passwords must match')
+})
 
 export function SignUp() {
+  const { control, handleSubmit, formState: { errors } } = useForm<FormDataProps>(
+    {
+      resolver: yupResolver(signUpSchema),
+    }
+  );
+
   const navigation = useNavigation();
 
   function handleGoBack() {
     navigation.goBack();
+  }
+
+  function handleSignUp(data: FormDataProps) {
+    console.log({data});
   }
 
   return (
@@ -46,16 +73,67 @@ export function SignUp() {
             Cree su cuenta
           </Heading>
 
-          <Input placeholder="Nombres y apellidos" autoCorrect={false} />
-          <Input
-            placeholder="Correo electrónico"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
+          <Controller 
+            control={control}
+            name="name"
+            render={({field: {onChange, value,}}) => (
+              <Input 
+                placeholder="Nombres y apellidos" 
+                autoCorrect={false} 
+                onChangeText={onChange}
+                value={value}
+                errorMessages={errors.name?.message}
+              />
+            )}
           />
-          <Input placeholder="Contraseña" secureTextEntry />
 
-          <Button title="Crear e ingresar" />
+          <Controller 
+            control={control}
+            name="email"
+            render={({field: {onChange, value,}}) => (
+              <Input
+                placeholder="Correo electrónico"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                onChangeText={onChange}
+                value={value}
+                errorMessages={errors.email?.message}
+              />
+            )}
+          />
+
+          <Controller 
+            control={control}
+            name="password"
+            render={({field: {onChange, value,}}) => (
+              <Input 
+                placeholder="Contraseña" 
+                secureTextEntry 
+                onChangeText={onChange}
+                value={value}
+                errorMessages={errors.password?.message}
+              />
+            )}
+          />
+          <Controller 
+            control={control}
+            name="password_confirm"
+            render={({field: {onChange, value,}}) => (
+              <Input 
+                placeholder="Confirmar contraseña" 
+                secureTextEntry 
+                onChangeText={onChange}
+                value={value}
+                onSubmitEditing={handleSubmit(handleSignUp)}
+                returnKeyType="send"
+                errorMessages={errors.password_confirm?.message}
+              />
+            )}
+          />
+
+
+          <Button title="Crear e ingresar" onPress={handleSubmit(handleSignUp)} />
         </Center>
 
         <Button
